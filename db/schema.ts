@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, numeric, timestamp, foreignKey } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, numeric, timestamp, foreignKey, boolean } from "drizzle-orm/pg-core";
 import { createInsertSchema, createSelectSchema } from "drizzle-zod";
 import { relations } from "drizzle-orm";
 
@@ -7,6 +7,7 @@ export const users = pgTable("users", {
   username: text("username").unique().notNull(),
   password: text("password").notNull(),
   email: text("email").unique().notNull(),
+  isAdmin: boolean("is_admin").default(false).notNull(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
