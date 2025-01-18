@@ -6,6 +6,7 @@ import Stripe from "stripe";
 import passport from "./auth";
 import bcrypt from "crypto";
 import { eq } from "drizzle-orm";
+import { adminMiddleware } from "./middleware/admin";
 
 if (!process.env.STRIPE_SECRET_KEY) {
   throw new Error("STRIPE_SECRET_KEY must be set");
@@ -38,6 +39,7 @@ export function registerRoutes(app: Express): Server {
           username,
           password: hashedPassword,
           email,
+          isAdmin: false, // New users are not admins by default
         })
         .returning();
 
@@ -45,7 +47,7 @@ export function registerRoutes(app: Express): Server {
         if (err) {
           return res.status(500).json({ message: "Error logging in" });
         }
-        return res.json({ user: { id: user.id, username: user.username, email: user.email } });
+        return res.json({ user: { id: user.id, username: user.username, email: user.email, isAdmin: user.isAdmin } });
       });
     } catch (error) {
       res.status(500).json({ message: "Error creating user" });
@@ -54,7 +56,7 @@ export function registerRoutes(app: Express): Server {
 
   app.post("/api/auth/login", passport.authenticate("local"), (req, res) => {
     const user = req.user as any;
-    res.json({ user: { id: user.id, username: user.username, email: user.email } });
+    res.json({ user: { id: user.id, username: user.username, email: user.email, isAdmin: user.isAdmin } });
   });
 
   app.post("/api/auth/logout", (req, res) => {
@@ -68,13 +70,55 @@ export function registerRoutes(app: Express): Server {
       return res.status(401).json({ message: "Not authenticated" });
     }
     const user = req.user as any;
-    res.json({ user: { id: user.id, username: user.username, email: user.email } });
+    res.json({ user: { id: user.id, username: user.username, email: user.email, isAdmin: user.isAdmin } });
+  });
+
+  // Admin routes
+  app.post("/api/admin/products", adminMiddleware, async (req, res) => {
+    try {
+      const [product] = await db.insert(products).values(req.body).returning();
+      res.json(product);
+    } catch (error) {
+      res.status(500).json({ message: "Error creating product" });
+    }
+  });
+
+  app.put("/api/admin/products/:id", adminMiddleware, async (req, res) => {
+    try {
+      const [product] = await db
+        .update(products)
+        .set(req.body)
+        .where(eq(products.id, parseInt(req.params.id)))
+        .returning();
+      res.json(product);
+    } catch (error) {
+      res.status(500).json({ message: "Error updating product" });
+    }
+  });
+
+  app.delete("/api/admin/products/:id", adminMiddleware, async (req, res) => {
+    try {
+      await db.delete(products).where(eq(products.id, parseInt(req.params.id)));
+      res.json({ message: "Product deleted successfully" });
+    } catch (error) {
+      res.status(500).json({ message: "Error deleting product" });
+    }
   });
 
   // Existing routes
   app.get("/api/products", async (_req, res) => {
     const allProducts = await db.select().from(products);
     res.json(allProducts);
+  });
+
+  app.get("/api/products/:id", async (req, res) => {
+    const product = await db.query.products.findFirst({
+      where: eq(products.id, parseInt(req.params.id)),
+    });
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+    res.json(product);
   });
 
   // Order history
