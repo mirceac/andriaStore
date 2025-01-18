@@ -8,6 +8,7 @@ import NotFound from "@/pages/not-found";
 import Home from "@/pages/home";
 import Dashboard from "@/pages/dashboard";
 import AdminDashboard from "@/pages/admin/dashboard";
+import ProductForm from "@/pages/admin/product-form";
 
 function Router() {
   return (
@@ -15,6 +16,8 @@ function Router() {
       <Route path="/" component={Home} />
       <Route path="/dashboard" component={Dashboard} />
       <Route path="/admin/dashboard" component={AdminDashboard} />
+      <Route path="/admin/products/new" component={ProductForm} />
+      <Route path="/admin/products/:id" component={ProductForm} />
       <Route component={NotFound} />
     </Switch>
   );
