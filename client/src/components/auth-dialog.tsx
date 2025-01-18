@@ -103,11 +103,17 @@ export function AuthDialog() {
               <FormField
                 control={loginForm.control}
                 name="username"
-                render={({ field }) => (
+                render={({ field: { onChange, onBlur, value, ref } }) => (
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter username" />
+                      <Input
+                        ref={ref}
+                        value={value}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        placeholder="Enter username"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -116,11 +122,18 @@ export function AuthDialog() {
               <FormField
                 control={loginForm.control}
                 name="password"
-                render={({ field }) => (
+                render={({ field: { onChange, onBlur, value, ref } }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" placeholder="Enter password" />
+                      <Input
+                        ref={ref}
+                        type="password"
+                        value={value}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        placeholder="Enter password"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -144,11 +157,17 @@ export function AuthDialog() {
               <FormField
                 control={signupForm.control}
                 name="username"
-                render={({ field }) => (
+                render={({ field: { onChange, onBlur, value, ref } }) => (
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter username" />
+                      <Input
+                        ref={ref}
+                        value={value}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        placeholder="Enter username"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -157,11 +176,18 @@ export function AuthDialog() {
               <FormField
                 control={signupForm.control}
                 name="email"
-                render={({ field }) => (
+                render={({ field: { onChange, onBlur, value, ref } }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input {...field} type="email" placeholder="Enter email" />
+                      <Input
+                        ref={ref}
+                        type="email"
+                        value={value}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        placeholder="Enter email"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -170,11 +196,18 @@ export function AuthDialog() {
               <FormField
                 control={signupForm.control}
                 name="password"
-                render={({ field }) => (
+                render={({ field: { onChange, onBlur, value, ref } }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input {...field} type="password" placeholder="Enter password" />
+                      <Input
+                        ref={ref}
+                        type="password"
+                        value={value}
+                        onChange={onChange}
+                        onBlur={onBlur}
+                        placeholder="Enter password"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
