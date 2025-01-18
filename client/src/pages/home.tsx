@@ -4,9 +4,14 @@ import { AuthDialog } from "@/components/auth-dialog";
 import { useAuth } from "@/lib/auth-context";
 import { Button } from "@/components/ui/button";
 import { Link } from "wouter";
+import { LogOut } from "lucide-react";
 
 export default function Home() {
   const { user, logout } = useAuth();
+
+  const handleSignOut = async () => {
+    await logout();
+  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -24,7 +29,8 @@ export default function Home() {
                     <Button variant="ghost">Admin</Button>
                   </Link>
                 )}
-                <Button variant="outline" onClick={logout}>
+                <Button variant="outline" onClick={handleSignOut}>
+                  <LogOut className="mr-2 h-4 w-4" />
                   Sign Out
                 </Button>
               </>
