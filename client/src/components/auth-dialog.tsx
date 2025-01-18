@@ -51,8 +51,8 @@ export function AuthDialog() {
     resolver: zodResolver(signupSchema),
     defaultValues: {
       username: "",
-      password: "",
       email: "",
+      password: "",
     },
   });
 
@@ -103,17 +103,11 @@ export function AuthDialog() {
               <FormField
                 control={loginForm.control}
                 name="username"
-                render={({ field: { onChange, onBlur, value, ref } }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input
-                        ref={ref}
-                        value={value}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                        placeholder="Enter username"
-                      />
+                      <Input {...field} placeholder="Enter username" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -122,18 +116,11 @@ export function AuthDialog() {
               <FormField
                 control={loginForm.control}
                 name="password"
-                render={({ field: { onChange, onBlur, value, ref } }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
-                        ref={ref}
-                        type="password"
-                        value={value}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                        placeholder="Enter password"
-                      />
+                      <Input {...field} type="password" placeholder="Enter password" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -157,17 +144,11 @@ export function AuthDialog() {
               <FormField
                 control={signupForm.control}
                 name="username"
-                render={({ field: { onChange, onBlur, value, ref } }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input
-                        ref={ref}
-                        value={value}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                        placeholder="Enter username"
-                      />
+                      <Input {...field} placeholder="Enter username" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -176,18 +157,11 @@ export function AuthDialog() {
               <FormField
                 control={signupForm.control}
                 name="email"
-                render={({ field: { onChange, onBlur, value, ref } }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input
-                        ref={ref}
-                        type="email"
-                        value={value}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                        placeholder="Enter email"
-                      />
+                      <Input {...field} type="email" placeholder="Enter email" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -196,18 +170,11 @@ export function AuthDialog() {
               <FormField
                 control={signupForm.control}
                 name="password"
-                render={({ field: { onChange, onBlur, value, ref } }) => (
+                render={({ field }) => (
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input
-                        ref={ref}
-                        type="password"
-                        value={value}
-                        onChange={onChange}
-                        onBlur={onBlur}
-                        placeholder="Enter password"
-                      />
+                      <Input {...field} type="password" placeholder="Enter password" />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
