@@ -98,86 +98,100 @@ export function AuthDialog() {
         </DialogHeader>
 
         {mode === "login" ? (
-          <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <Input
-                type="text"
-                {...loginForm.register("username")}
-                placeholder="Enter username"
+          <Form {...loginForm}>
+            <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
+              <FormField
+                control={loginForm.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter username" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {loginForm.formState.errors.username && (
-                <FormMessage>{loginForm.formState.errors.username.message}</FormMessage>
-              )}
-            </FormItem>
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <Input
-                type="password"
-                {...loginForm.register("password")}
-                placeholder="Enter password"
+              <FormField
+                control={loginForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="password" placeholder="Enter password" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {loginForm.formState.errors.password && (
-                <FormMessage>{loginForm.formState.errors.password.message}</FormMessage>
-              )}
-            </FormItem>
-            <div className="flex flex-col gap-4">
-              <Button type="submit">Sign In</Button>
-              <Button
-                type="button"
-                variant="link"
-                onClick={() => switchMode("signup")}
-              >
-                Don't have an account? Sign up
-              </Button>
-            </div>
-          </form>
+              <div className="flex flex-col gap-4">
+                <Button type="submit">Sign In</Button>
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => switchMode("signup")}
+                >
+                  Don't have an account? Sign up
+                </Button>
+              </div>
+            </form>
+          </Form>
         ) : (
-          <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
-            <FormItem>
-              <FormLabel>Username</FormLabel>
-              <Input
-                type="text"
-                {...signupForm.register("username")}
-                placeholder="Enter username"
+          <Form {...signupForm}>
+            <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
+              <FormField
+                control={signupForm.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder="Enter username" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {signupForm.formState.errors.username && (
-                <FormMessage>{signupForm.formState.errors.username.message}</FormMessage>
-              )}
-            </FormItem>
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <Input
-                type="email"
-                {...signupForm.register("email")}
-                placeholder="Enter email"
+              <FormField
+                control={signupForm.control}
+                name="email"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Email</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="email" placeholder="Enter email" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {signupForm.formState.errors.email && (
-                <FormMessage>{signupForm.formState.errors.email.message}</FormMessage>
-              )}
-            </FormItem>
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <Input
-                type="password"
-                {...signupForm.register("password")}
-                placeholder="Enter password"
+              <FormField
+                control={signupForm.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input {...field} type="password" placeholder="Enter password" />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
               />
-              {signupForm.formState.errors.password && (
-                <FormMessage>{signupForm.formState.errors.password.message}</FormMessage>
-              )}
-            </FormItem>
-            <div className="flex flex-col gap-4">
-              <Button type="submit">Create Account</Button>
-              <Button
-                type="button"
-                variant="link"
-                onClick={() => switchMode("login")}
-              >
-                Already have an account? Sign in
-              </Button>
-            </div>
-          </form>
+              <div className="flex flex-col gap-4">
+                <Button type="submit">Create Account</Button>
+                <Button
+                  type="button"
+                  variant="link"
+                  onClick={() => switchMode("login")}
+                >
+                  Already have an account? Sign in
+                </Button>
+              </div>
+            </form>
+          </Form>
         )}
       </DialogContent>
     </Dialog>
