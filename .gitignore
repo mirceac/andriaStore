@@ -1,6 +1,46 @@
-node_modules
-dist
+# Dependencies
+node_modules/
+dist/
+
+# Environment
+.env
+.env.local
+.env.*.local
+.env.development
+.env.production
+
+# Build output
+dist/
+build/
+server/public/
+
+# IDE and editor files
+.idea/
+.vscode/
+*.swp
+*.swo
 .DS_Store
-server/public
+*.pem
+
+# Debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Development files
+*.log
+.cache/
+coverage/
 vite.config.ts.*
 *.tar.gz
+
+# Database
+*.sqlite
+*.sqlite3
+drizzle/
+
+# Typescript
+*.tsbuildinfo
+
+# Testing
+coverage/
