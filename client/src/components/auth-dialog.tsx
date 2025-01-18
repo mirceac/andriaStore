@@ -51,34 +51,36 @@ export function AuthDialog() {
     resolver: zodResolver(signupSchema),
     defaultValues: {
       username: "",
-      email: "",
       password: "",
+      email: "",
     },
   });
 
-  const onSubmit = async (data: LoginForm | SignupForm) => {
+  async function onLoginSubmit(data: LoginForm) {
     try {
-      if (mode === "login") {
-        await login(data.username, data.password);
-      } else {
-        const signupData = data as SignupForm;
-        await signup(signupData.username, signupData.password, signupData.email);
-      }
+      await login(data.username, data.password);
       setIsOpen(false);
-      // Reset forms after successful submission
       loginForm.reset();
+    } catch (error) {
+      // Error handled by auth context
+    }
+  }
+
+  async function onSignupSubmit(data: SignupForm) {
+    try {
+      await signup(data.username, data.password, data.email);
+      setIsOpen(false);
       signupForm.reset();
     } catch (error) {
-      // Error is handled by the auth context
+      // Error handled by auth context
     }
-  };
+  }
 
-  const switchMode = (newMode: "login" | "signup") => {
+  function switchMode(newMode: "login" | "signup") {
     setMode(newMode);
-    // Reset forms when switching modes
     loginForm.reset();
     signupForm.reset();
-  };
+  }
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -94,9 +96,10 @@ export function AuthDialog() {
               : "Create a new account to get started"}
           </DialogDescription>
         </DialogHeader>
+
         {mode === "login" ? (
           <Form {...loginForm}>
-            <form onSubmit={loginForm.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4">
               <FormField
                 control={loginForm.control}
                 name="username"
@@ -137,7 +140,7 @@ export function AuthDialog() {
           </Form>
         ) : (
           <Form {...signupForm}>
-            <form onSubmit={signupForm.handleSubmit(onSubmit)} className="space-y-4">
+            <form onSubmit={signupForm.handleSubmit(onSignupSubmit)} className="space-y-4">
               <FormField
                 control={signupForm.control}
                 name="username"
@@ -145,7 +148,7 @@ export function AuthDialog() {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter username" {...field} />
+                      <Input type="text" placeholder="Enter username" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -158,11 +161,7 @@ export function AuthDialog() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="email" 
-                        placeholder="Enter email"
-                        {...field}
-                      />
+                      <Input type="email" placeholder="Enter email" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -175,11 +174,7 @@ export function AuthDialog() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="password" 
-                        placeholder="Enter password"
-                        {...field}
-                      />
+                      <Input type="password" placeholder="Enter password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
