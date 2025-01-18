@@ -149,7 +149,11 @@ export function AuthDialog() {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input {...field} placeholder="Enter username" />
+                      <Input 
+                        {...field} 
+                        placeholder="Enter username"
+                        autoComplete="off"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -162,7 +166,12 @@ export function AuthDialog() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input {...field} type="email" placeholder="Enter email" />
+                      <Input 
+                        {...field} 
+                        type="email" 
+                        placeholder="Enter email"
+                        autoComplete="off"
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
