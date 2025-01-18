@@ -132,6 +132,7 @@ export function AuthDialog() {
                   type="button"
                   variant="link"
                   onClick={() => switchMode("signup")}
+                  className="text-gray-500"
                 >
                   Don't have an account? Sign up
                 </Button>
@@ -186,6 +187,7 @@ export function AuthDialog() {
                   type="button"
                   variant="link"
                   onClick={() => switchMode("login")}
+                  className="text-gray-500"
                 >
                   Already have an account? Sign in
                 </Button>
