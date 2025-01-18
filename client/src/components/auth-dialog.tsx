@@ -51,8 +51,8 @@ export function AuthDialog() {
     resolver: zodResolver(signupSchema),
     defaultValues: {
       username: "",
-      password: "",
       email: "",
+      password: "",
     },
   });
 
@@ -61,12 +61,23 @@ export function AuthDialog() {
       if (mode === "login") {
         await login(data.username, data.password);
       } else {
-        await signup((data as SignupForm).username, (data as SignupForm).password, (data as SignupForm).email);
+        const signupData = data as SignupForm;
+        await signup(signupData.username, signupData.password, signupData.email);
       }
       setIsOpen(false);
+      // Reset forms after successful submission
+      loginForm.reset();
+      signupForm.reset();
     } catch (error) {
       // Error is handled by the auth context
     }
+  };
+
+  const switchMode = (newMode: "login" | "signup") => {
+    setMode(newMode);
+    // Reset forms when switching modes
+    loginForm.reset();
+    signupForm.reset();
   };
 
   return (
@@ -93,7 +104,7 @@ export function AuthDialog() {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="Enter username" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -106,7 +117,7 @@ export function AuthDialog() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input type="password" placeholder="Enter password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -117,7 +128,7 @@ export function AuthDialog() {
                 <Button
                   type="button"
                   variant="link"
-                  onClick={() => setMode("signup")}
+                  onClick={() => switchMode("signup")}
                 >
                   Don't have an account? Sign up
                 </Button>
@@ -134,7 +145,7 @@ export function AuthDialog() {
                   <FormItem>
                     <FormLabel>Username</FormLabel>
                     <FormControl>
-                      <Input {...field} />
+                      <Input placeholder="Enter username" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -147,7 +158,11 @@ export function AuthDialog() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input type="email" {...field} />
+                      <Input 
+                        type="email" 
+                        placeholder="Enter email"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -160,7 +175,11 @@ export function AuthDialog() {
                   <FormItem>
                     <FormLabel>Password</FormLabel>
                     <FormControl>
-                      <Input type="password" {...field} />
+                      <Input 
+                        type="password" 
+                        placeholder="Enter password"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -171,7 +190,7 @@ export function AuthDialog() {
                 <Button
                   type="button"
                   variant="link"
-                  onClick={() => setMode("login")}
+                  onClick={() => switchMode("login")}
                 >
                   Already have an account? Sign in
                 </Button>
