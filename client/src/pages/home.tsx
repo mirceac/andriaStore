@@ -19,6 +19,11 @@ export default function Home() {
                 <Link href="/dashboard">
                   <Button variant="ghost">Dashboard</Button>
                 </Link>
+                {user.isAdmin && (
+                  <Link href="/admin/dashboard">
+                    <Button variant="ghost">Admin</Button>
+                  </Link>
+                )}
                 <Button variant="outline" onClick={logout}>
                   Sign Out
                 </Button>
