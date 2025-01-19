@@ -1,3 +1,4 @@
+import { z } from "zod";
 import type { Express, Request } from "express";
 import { createServer, type Server } from "http";
 import { db } from "@db";
@@ -5,7 +6,7 @@ import { products, users, orders, orderItems } from "@db/schema";
 import Stripe from "stripe";
 import passport from "./auth";
 import bcrypt from "crypto";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { adminMiddleware } from "./middleware/admin";
 
 if (!process.env.STRIPE_SECRET_KEY) {
@@ -13,6 +14,23 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+// Product validation schema
+const createProductSchema = z.object({
+    name: z.string().min(1, "Name is required").max(255, "Name is too long"),
+    description: z.string().min(1, "Description is required"),
+    price: z.preprocess(
+      (val) => (typeof val === 'string' ? val : String(val)),
+      z.string().refine(
+        (val) => {
+          const num = Number(val);
+          return !isNaN(num) && num > 0;
+        },
+        { message: "Price must be a valid positive number" }
+      )
+    ),
+    image: z.string().url("Image must be a valid URL"),
+  });
 
 export function registerRoutes(app: Express): Server {
   // Auth routes
@@ -76,18 +94,48 @@ export function registerRoutes(app: Express): Server {
   // Admin routes
   app.post("/api/admin/products", adminMiddleware, async (req, res) => {
     try {
-      const [product] = await db.insert(products).values(req.body).returning();
+      const result = createProductSchema.safeParse(req.body);
+
+      if (!result.success) {
+        return res.status(400).json({
+          message: "Invalid input",
+          errors: result.error.errors,
+        });
+      }
+
+      const productData = {
+          name: result.data.name,
+          description: result.data.description,
+          price: result.data.price,
+          image: result.data.image,
+      };
+      
+      console.log("Attempting to insert product:", productData);
+          const [product] = await db
+            .insert(products)
+            .values(productData)
+            .returning();
+
       res.json(product);
     } catch (error) {
+      console.error("Error creating product:", error);
       res.status(500).json({ message: "Error creating product" });
     }
   });
 
   app.put("/api/admin/products/:id", adminMiddleware, async (req, res) => {
     try {
+      const result = createProductSchema.safeParse(req.body);
+
+      if (!result.success) {
+        return res.status(400).json({
+          message: "Invalid input",
+          errors: result.error.errors,
+        });
+      }
       const [product] = await db
         .update(products)
-        .set(req.body)
+        .set(result.data)
         .where(eq(products.id, parseInt(req.params.id)))
         .returning();
       res.json(product);
@@ -150,7 +198,7 @@ export function registerRoutes(app: Express): Server {
     const productsData = await db
       .select()
       .from(products)
-      .where(products.id.in(productIds));
+      .where(inArray(products.id, productIds));
 
     const lineItems = items.map((item: { id: number; quantity: number }) => {
       const product = productsData.find(p => p.id === item.id);

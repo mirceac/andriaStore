@@ -19,45 +19,66 @@ import { useToast } from "@/hooks/use-toast";
 import type { SelectProduct } from "@db/schema";
 
 const productSchema = z.object({
-  name: z.string().min(1, "Name is required"),
+  name: z.string().min(1, "Name is required").max(255, "Name is too long"),
   description: z.string().min(1, "Description is required"),
-  price: z.string().min(1, "Price is required").regex(/^\d+(\.\d{1,2})?$/, "Invalid price format"),
+  price: z.string()
+    .min(1, "Price is required")
+    .refine((val) => {
+      const num = Number(val);
+      return !isNaN(num) && num > 0;
+    }, "Price must be a valid positive number"),
   image: z.string().url("Must be a valid URL"),
 });
 
-type ProductForm = z.infer<typeof productSchema>;
+type ProductFormData = z.infer<typeof productSchema>;
 
 export default function ProductForm() {
   const [, setLocation] = useLocation();
-  const [match, params] = useRoute("/admin/products/:id");
+  const [isMatch, params] = useRoute("/admin/products/:id");
+  const isEditMode = isMatch && params?.id && params.id !== 'new';
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   const { data: product, isLoading: isLoadingProduct } = useQuery<SelectProduct>({
     queryKey: [`/api/products/${params?.id}`],
-    enabled: !!params?.id,
+    enabled: !!isEditMode && !!params?.id,
   });
 
-  const form = useForm<ProductForm>({
+  const form = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: {
-      name: product?.name ?? "",
-      description: product?.description ?? "",
-      price: product?.price?.toString() ?? "",
-      image: product?.image ?? "",
+      name: "",
+      description: "",
+      price: "0.00",
+      image: "",
     },
+    values: product ? {
+      name: product.name,
+      description: product.description,
+      price: product.price.toString(),
+      image: product.image,
+    } : undefined,
   });
 
   const createMutation = useMutation({
-    mutationFn: async (data: ProductForm) => {
+    mutationFn: async (data: ProductFormData) => {
+      const price = Number(data.price);
+      if (isNaN(price) || price <= 0) {
+        throw new Error("Invalid price value");
+      }
+
       const response = await fetch("/api/admin/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, price: parseFloat(data.price) }),
+        body: JSON.stringify({
+          ...data,
+          price: price.toFixed(2),
+        }),
       });
 
       if (!response.ok) {
-        throw new Error(await response.text());
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to create product");
       }
 
       return response.json();
@@ -71,6 +92,7 @@ export default function ProductForm() {
       setLocation("/admin/dashboard");
     },
     onError: (error) => {
+      console.error("Creation error:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -80,15 +102,26 @@ export default function ProductForm() {
   });
 
   const updateMutation = useMutation({
-    mutationFn: async (data: ProductForm) => {
-      const response = await fetch(`/api/admin/products/${params?.id}`, {
+    mutationFn: async (data: ProductFormData) => {
+      if (!params?.id) throw new Error("No product ID provided");
+
+      const price = Number(data.price);
+      if (isNaN(price) || price <= 0) {
+        throw new Error("Invalid price value");
+      }
+
+      const response = await fetch(`/api/admin/products/${params.id}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...data, price: parseFloat(data.price) }),
+        body: JSON.stringify({
+          ...data,
+          price: price.toFixed(2),
+        }),
       });
 
       if (!response.ok) {
-        throw new Error(await response.text());
+        const errorText = await response.text();
+        throw new Error(errorText || "Failed to update product");
       }
 
       return response.json();
@@ -102,6 +135,7 @@ export default function ProductForm() {
       setLocation("/admin/dashboard");
     },
     onError: (error) => {
+      console.error("Update error:", error);
       toast({
         variant: "destructive",
         title: "Error",
@@ -110,15 +144,19 @@ export default function ProductForm() {
     },
   });
 
-  async function onSubmit(data: ProductForm) {
-    if (match) {
-      await updateMutation.mutateAsync(data);
-    } else {
-      await createMutation.mutateAsync(data);
+  async function onSubmit(data: ProductFormData) {
+    try {
+      if (isEditMode) {
+        await updateMutation.mutateAsync(data);
+      } else {
+        await createMutation.mutateAsync(data);
+      }
+    } catch (error) {
+      console.error("Form submission error:", error);
     }
   }
 
-  if (match && isLoadingProduct) {
+  if (isEditMode && isLoadingProduct) {
     return (
       <div className="min-h-screen bg-background">
         <div className="container mx-auto px-4 py-8">
@@ -148,7 +186,7 @@ export default function ProductForm() {
         </Button>
 
         <h1 className="text-3xl font-bold mb-8">
-          {match ? "Edit Product" : "Add New Product"}
+          {isEditMode ? "Edit Product" : "Add New Product"}
         </h1>
 
         <div className="max-w-2xl">
@@ -195,7 +233,9 @@ export default function ProductForm() {
                     <FormControl>
                       <Input
                         {...field}
-                        type="text"
+                        type="number"
+                        step="0.01"
+                        min="0.01"
                         placeholder="0.00"
                         inputMode="decimal"
                       />
@@ -219,8 +259,12 @@ export default function ProductForm() {
                 )}
               />
 
-              <Button type="submit" className="w-full">
-                {match ? "Update Product" : "Create Product"}
+              <Button 
+                type="submit" 
+                className="w-full"
+                disabled={createMutation.isPending || updateMutation.isPending}
+              >
+                {isEditMode ? "Update Product" : "Create Product"}
               </Button>
             </form>
           </Form>
